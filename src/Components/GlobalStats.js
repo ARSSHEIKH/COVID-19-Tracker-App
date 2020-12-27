@@ -19,7 +19,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function GlobalStats({currentScreen}) {
   const [covidData, setCovidData] = useState({});
-  console.log(currentScreen)
   let data;
   
   useEffect(()=>{

@@ -16,13 +16,14 @@ export default function SearchBar(props) {
   const [options, setOptions] = React.useState([]);
   const [textChange, setText] = React.useState("Pakistan");
   const loading = open && options.length === 0;
+
+
   React.useEffect(() => {
     let active = true;
 
     if (!loading) {
       return undefined;
     }
-
     (async () => {
       const response = await fetch('https://country.register.gov.uk/records.json?page-size=5000');
       await sleep(1e3); // For demo purposes.
