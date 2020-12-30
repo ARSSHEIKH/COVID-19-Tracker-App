@@ -1,6 +1,6 @@
 import React from 'react';
 import GlobalStats from './GlobalStats.js'
-import AllCountries from './AllCountries.js'
+import GraphStats from './GraphStats.js'
 import SearchBar from './SearchBar.js'
 
 export default function FullWidthGrid({currentScreen}) {
@@ -9,6 +9,6 @@ export default function FullWidthGrid({currentScreen}) {
   else  if(currentScreen === 1)
     return <SearchBar/>
   else 
-    return <AllCountries/>
+    return <GraphStats/>
   
 }
