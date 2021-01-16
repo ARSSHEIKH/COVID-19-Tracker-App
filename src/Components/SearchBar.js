@@ -11,12 +11,11 @@ function sleep(delay = 0) {
   });
 }
 
-export default function SearchBar(props) {
+export default function SearchBar({userId}) {
   const [open, setOpen] = React.useState(false);
   const [options, setOptions] = React.useState([]);
   const [textChange, setText] = React.useState("Pakistan");
   const loading = open && options.length === 0;
-
 
   React.useEffect(() => {
     let active = true;
@@ -80,14 +79,11 @@ export default function SearchBar(props) {
                 </React.Fragment>
               ),
             }}
-            placeholder="Search ..."
+            placeholder="Search Country..."
           />
         )}
       />
-       {/* <IconButton aria-label="Search" style={{border: '1px solid'}} color="primary">
-        <Search />
-      </IconButton> */}
-      <AllCountries text={textChange}/>
+      <AllCountries text={textChange} userId={userId}/>
     </form>
       </>
   );

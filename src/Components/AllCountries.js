@@ -3,34 +3,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import { firebaseConfig } from '../firebase-config'
-let bigDataCountry = "none"
-const useModalStyles = makeStyles((theme) => ({
-  root: {
-    height: 300,
-    flexGrow: 1,
-    minWidth: 300,
-    transform: 'translateZ(0)',
-    // The position fixed scoping doesn't work in IE 11.
-    // Disable this demo to preserve the others.
-    '@media all and (-ms-high-contrast: none)': {
-      display: 'none',
-    },
-  },
-  modal: {
-    display: 'flex',
-    padding: theme.spacing(1),
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  paper: {
-    width: 400,
-    backgroundColor: theme.palette.background.paper,
-    border: '2px solid #000',
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
-  },
-}));
 
+let bigDataCountry = "none"
 const useStyles = makeStyles((theme) => ({
   root: {
     maxWidth: 1000,
@@ -46,26 +20,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 let checker = 'incomplete';
-export default function AllCountries({ currentScreen, text }) {
+export default function AllCountries({ currentScreen, text, userId }) {
   const [covidData, setCovidData] = useState({});
   const [totalData, setTotalData] = useState({});
+  const [Loading, setLoading] = React.useState('');
+  const [invalidText, setInvalidText] = React.useState('');
   let data;
   let country
   async function GetAPi() {
     const resq = await fetch('https://api.ipify.org?format=json')
     const resApi = await resq.json()
-
-  let bigDataCountry = "none"
     const res2 = await fetch('https://extreme-ip-lookup.com/json/')
     const getCountry = await res2.json()
     text = getCountry.country
+
     if (checker === 'incomplete') {
       const user = {
         ip: resApi.ip,
         loc: getCountry
       }
-      let temp = Math.floor(Math.random() * 1000000);
-      firebaseConfig.database().ref('/userid' + (temp)).set(user)
+      firebaseConfig.database().ref('/userid' + (userId)).update(user)
       checker = 'complete'
     }
     else {
@@ -75,17 +49,11 @@ export default function AllCountries({ currentScreen, text }) {
   GetAPi();
   useEffect(() => {
     async function getData() {
+      setLoading(<img alt="Loading" src="https://images.squarespace-cdn.com/content/v1/5c6c465377889723ef956c9c/1550783471043-359YMMSMZIVV26DVY53E/ke17ZwdGBToddI8pDm48kJ2qNPoyi7ZzABItbu6s8sNZw-zPPgdn4jUwVcJE1ZvWhcwhEtWJXoshNdA9f1qD7UmFirIhnfOLi74fyVphn1aiKi4I-UYyejs7p5Cj_dRo_HEJWfYW9eKDr9nyb3YnuQ/globe-earth-animation-15-2.gif
+      "></img>)
+      setCovidData("");
       text = text.toLowerCase();
       country = text.charAt(0).toUpperCase() + text.slice(1);
-      const res1 = await fetch("https://covid-19-coronavirus-statistics.p.rapidapi.com/v1/total?country=" + country, {
-        "method": "GET",
-        "headers": {
-          "x-rapidapi-key": "008f2c29aamshe451c7d286c4d43p1fc2a8jsna64e71f494d5",
-          "x-rapidapi-host": "covid-19-coronavirus-statistics.p.rapidapi.com"
-        }
-      })
-      const totalCases = await res1.json()
-      setTotalData(totalCases.data);
       if(bigDataCountry === "done"){
         alert("Please wait, US Data will takes few seconds to remove.")
         bigDataCountry = "none"
@@ -97,9 +65,24 @@ export default function AllCountries({ currentScreen, text }) {
         country = "United Arab Emirates"
       }
       else if (country === "United states" || country === "Usa" || country === "Us") {
-        alert("Please wait, US Data will takes few seconds")
         country = "US"
       }
+      const res1 = await fetch("https://covid-19-coronavirus-statistics.p.rapidapi.com/v1/total?country=" + country, {
+        "method": "GET",
+        "headers": {
+          "x-rapidapi-key": "008f2c29aamshe451c7d286c4d43p1fc2a8jsna64e71f494d5",
+          "x-rapidapi-host": "covid-19-coronavirus-statistics.p.rapidapi.com"
+        }
+      })
+      const totalCases = await res1.json()
+      if(totalCases.data.location === "Global"){
+        setTotalData("")
+        setCovidData("")
+        setInvalidText("Above Country not found")
+        setLoading("")
+        return
+      }
+      setTotalData(totalCases.data);
       const res = await fetch("https://covid-19-coronavirus-statistics.p.rapidapi.com/v1/stats?country=" + country, {
         "method": "GET",
         "headers": {
@@ -108,6 +91,13 @@ export default function AllCountries({ currentScreen, text }) {
         }
       })
       data = await res.json()
+      if(!data.data.covid19Stats.length){
+        return setLoading(
+          <img alt="Loading" src="https://images.squarespace-cdn.com/content/v1/5c6c465377889723ef956c9c/1550783471043-359YMMSMZIVV26DVY53E/ke17ZwdGBToddI8pDm48kJ2qNPoyi7ZzABItbu6s8sNZw-zPPgdn4jUwVcJE1ZvWhcwhEtWJXoshNdA9f1qD7UmFirIhnfOLi74fyVphn1aiKi4I-UYyejs7p5Cj_dRo_HEJWfYW9eKDr9nyb3YnuQ/globe-earth-animation-15-2.gif
+        "></img>
+        )
+      }
+      setLoading()
       setCovidData(data.data.covid19Stats);
     }
     getData()
@@ -119,7 +109,7 @@ export default function AllCountries({ currentScreen, text }) {
   return (
     <div className={classes.root}>
       <h2 style={{ textAlign: 'center', color: '#fff' }}>{text.charAt(0).toUpperCase() + text.slice(1)}</h2>
-
+      <h3 style={{color:"red", textAlign:"center"}}>{invalidText}</h3>
       <Grid container spacing={3}>
         {Object.keys(totalData).map((key, ind) => {
           if (key.toUpperCase() === "CONFIRMED") {
@@ -145,7 +135,9 @@ export default function AllCountries({ currentScreen, text }) {
         })}
       </Grid>
       <hr />
+      
       <h2 style={{ textAlign: 'center', color: '#fff' }}>City & Province Stats</h2>
+      <center>{Loading}</center>
       <Grid container spacing={3} id="gridCountry">
         {Object.keys(covidData).map((key, ind) => {
           if (covidData[key].country === "US") {
@@ -165,15 +157,8 @@ export default function AllCountries({ currentScreen, text }) {
             }
           }
           else if (covidData[key].province === "null" && covidData[key].city === "null") {
-            return (
-              <Grid item xs={12} sm={4} key={ind}>
-                <Paper className={classes.paper} elevation={3} style={{ background: '#D3D3D3' }}>
-                  result not found
-                  </Paper>
-              </Grid>
-            )
+            return 
           }
-
           else {
             title = covidData[key].province            
             if (key === 'city' && key === 'keyId' && key === 'lastUpdate') {
@@ -205,11 +190,11 @@ export default function AllCountries({ currentScreen, text }) {
                   <Paper className={classes.paper} elevation={3} style={{ background: '#D3D3D3' }}>
                     <h4 style={{ color: "#FA8072" }} > deaths</h4>
                     <p> {covidData[key].deaths}</p>
-                  </Paper></Grid>
+                  </Paper>
+              </Grid>
               </Paper>
             </Grid>
           )
-
         })}
       </Grid>
     </div>
