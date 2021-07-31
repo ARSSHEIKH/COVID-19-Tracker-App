@@ -4,23 +4,25 @@ import { FormControl, FormLabel, FormControlLabel, RadioGroup, Radio } from '@ma
 
 let dataDeaths = [], dataConfirmed = [], dataRecovered = []
 let apiData = []
-let date = new Date();
+let date = new Date((new Date((new Date().valueOf() - 1000 * 60 * 60 * 24)).valueOf() - 1000 * 60 * 60 * 24));
 let month = date.getMonth() + 1
 let dataIndex = 7
 let title;
-let usingDate = date.getDate() - 2;
+let usingDate = date.getDate()
 let year = date.getFullYear();
 let dateDash = "-";
 
 export default function GraphStats({ text }) {
 
   let country
-  const [value, setValue] = React.useState('global');
+  const [value, setValue] = React.useState('country');
   const [Loading, setLoading] = React.useState('');
   const [error, setError] = React.useState('');
   const [ability, setAbility] = React.useState(false)
 
-  const monthName = ['June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec', 'Jan']
+  let monthName = [
+    'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July'
+  ]
   const handleChange = (event) => {
     setValue(event.target.value);
   };
@@ -39,9 +41,13 @@ export default function GraphStats({ text }) {
     ]
   });
 
+  if (month === 8) {
+    monthName = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug'
+    ]
+  }
 
   useEffect(() => {
-
     async function GetApiData() {
       text = text.toLowerCase();
       country = text.charAt(0).toUpperCase() + text.slice(1);
@@ -57,7 +63,7 @@ export default function GraphStats({ text }) {
       if (month === 0) {
         // usingDate = 29
         month = 12
-        year = year-1
+        year = year - 1
       }
       if (value === "global") {
         setError(``);
@@ -73,7 +79,7 @@ export default function GraphStats({ text }) {
               borderWidth: 1,
               hoverBackgroundColor: 'rgba(255,99,132,0.4)',
               hoverBorderColor: 'rgba(255,99,132,1)',
-              data: [0,0,0,0,0,0,0]
+              data: [0, 0, 0, 0, 0, 0, 0]
             },
             {
               label: 'Recovered',
@@ -82,7 +88,7 @@ export default function GraphStats({ text }) {
               borderWidth: 1,
               hoverBackgroundColor: 'rgb(22, 183, 118)',
               hoverBorderColor: 'rgb(22, 183, 96)',
-              data: [0,0,0,0,0,0,0]
+              data: [0, 0, 0, 0, 0, 0, 0]
             },
             {
               label: 'Confirmed',
@@ -91,46 +97,44 @@ export default function GraphStats({ text }) {
               borderWidth: 1,
               hoverBackgroundColor: 'rgb(0, 199, 218)',
               hoverBorderColor: 'rgb(36, 174, 206)',
-              data: [0,0,0,0,0,0,0]
+              data: [0, 0, 0, 0, 0, 0, 0]
             }
           ]
         })
         title = "Global Stats"
         if (month < 10) {
-          if(usingDate<10){
+          if (usingDate < 10) {
             dateDash = dateDash
           }
-          else if(usingDate>=10){
+          else if (usingDate >= 10) {
             dateDash = "-"
           }
           try {
-            const res = await fetch("https://covid-19-statistics.p.rapidapi.com/reports/total?date="+year+"-0" + month-- + dateDash + usingDate, {
+            const res = await fetch("https://covid-19-statistics.p.rapidapi.com/reports/total?date=" + year + "-0" + month-- + dateDash + usingDate, {
               "method": "GET",
               "headers": {
                 "x-rapidapi-key": "008f2c29aamshe451c7d286c4d43p1fc2a8jsna64e71f494d5",
                 "x-rapidapi-host": "covid-19-statistics.p.rapidapi.com"
               }
             })
-
             apiData[dataIndex] = await res.json()
             dataDeaths[dataIndex] = apiData[dataIndex].data.deaths
             dataConfirmed[dataIndex] = apiData[dataIndex].data.confirmed
             dataRecovered[dataIndex] = apiData[dataIndex].data.recovered
           }
           catch {
-            setError(`Something went wrong, 
-                  Maybe Internet Connection Failed`);
+            setError(`Something went wrong, Maybe Internet Connection Failed`);
           }
         }
         else {
-          if(usingDate<10){
+          if (usingDate < 10) {
             dateDash = "-0"
           }
-          else if(usingDate>=10){
+          else if (usingDate >= 10) {
             dateDash = "-"
           }
           try {
-            const res = await fetch("https://covid-19-statistics.p.rapidapi.com/reports/total?date="+year+"-" + month-- + dateDash + usingDate, {
+            const res = await fetch("https://covid-19-statistics.p.rapidapi.com/reports/total?date=" + year + "-" + month-- + dateDash + usingDate, {
               "method": "GET",
               "headers": {
                 "x-rapidapi-key": "008f2c29aamshe451c7d286c4d43p1fc2a8jsna64e71f494d5",
@@ -143,8 +147,7 @@ export default function GraphStats({ text }) {
             dataRecovered[dataIndex] = apiData[dataIndex].data.recovered
           }
           catch {
-            setError(`Something went wrong, 
-                  Maybe Internet Connection Failed`);
+            setError(`Something went wrong, Maybe Internet Connection Failed`);
           }
         }
         --dataIndex;
@@ -209,7 +212,7 @@ export default function GraphStats({ text }) {
               borderWidth: 1,
               hoverBackgroundColor: 'rgba(255,99,132,0.4)',
               hoverBorderColor: 'rgba(255,99,132,1)',
-              data: [0,0,0,0,0,0,0]
+              data: [0, 0, 0, 0, 0, 0, 0]
             },
             {
               label: 'Recovered',
@@ -218,7 +221,7 @@ export default function GraphStats({ text }) {
               borderWidth: 1,
               hoverBackgroundColor: 'rgb(22, 183, 118)',
               hoverBorderColor: 'rgb(22, 183, 96)',
-              data: [0,0,0,0,0,0,0]
+              data: [0, 0, 0, 0, 0, 0, 0]
             },
             {
               label: 'Confirmed',
@@ -227,63 +230,34 @@ export default function GraphStats({ text }) {
               borderWidth: 1,
               hoverBackgroundColor: 'rgb(0, 199, 218)',
               hoverBorderColor: 'rgb(36, 174, 206)',
-              data: [0,0,0,0,0,0,0]
+              data: [0, 0, 0, 0, 0, 0, 0]
             }
           ]
         })
         title = text.toUpperCase()
         if (month < 10) {
-          if(usingDate<10){
+          if (usingDate < 10) {
             dateDash = "-0"
           }
-          else if(usingDate>=10){
+          else if (usingDate >= 10) {
             dateDash = "-"
           }
           try {
             try {
-              const resConf = await fetch("https://covid1910.p.rapidapi.com/data/confirmed/country/" + country + "/date/0" + month + dateDash + usingDate + "-"+year, {
+              const resConf = await fetch("https://covid-193.p.rapidapi.com/history?country=" + country + "&day=" + year + "-0" + month-- + dateDash + usingDate, {
                 "method": "GET",
                 "headers": {
                   "x-rapidapi-key": "008f2c29aamshe451c7d286c4d43p1fc2a8jsna64e71f494d5",
-                  "x-rapidapi-host": "covid1910.p.rapidapi.com"
+                  "x-rapidapi-host": "covid-193.p.rapidapi.com"
                 }
               })
               const countryResConf = await resConf.json()
-              dataConfirmed[dataIndex] = countryResConf[0].confirmed
+              dataConfirmed[dataIndex] = countryResConf.response[0].cases.total
+              dataRecovered[dataIndex] = countryResConf.response[0].cases.recovered
+              dataDeaths[dataIndex] = countryResConf.response[0].deaths.total
             }
             catch {
-              setError(`Something went wrong, 
-                    Maybe Internet Connection Failed`);
-            }
-            try {
-              const resRecov = await fetch("https://covid1910.p.rapidapi.com/data/recovered/country/" + country + "/date/0" + month + dateDash + usingDate + "-"+year, {
-                "method": "GET",
-                "headers": {
-                  "x-rapidapi-key": "008f2c29aamshe451c7d286c4d43p1fc2a8jsna64e71f494d5",
-                  "x-rapidapi-host": "covid1910.p.rapidapi.com"
-                }
-              })
-              const countryResRecov = await resRecov.json()
-              dataRecovered[dataIndex] = countryResRecov[0].recovered
-            }
-            catch {
-              setError(`Something went wrong, 
-                    Maybe Internet Connection Failed`);
-            }
-            try {
-              const resDeath = await fetch("https://covid1910.p.rapidapi.com/data/death/country/" + country + "/date/0" + month-- + dateDash + usingDate + "-"+year, {
-                "method": "GET",
-                "headers": {
-                  "x-rapidapi-key": "008f2c29aamshe451c7d286c4d43p1fc2a8jsna64e71f494d5",
-                  "x-rapidapi-host": "covid1910.p.rapidapi.com"
-                }
-              })
-              const countryResDeath = await resDeath.json()
-              dataDeaths[dataIndex] = countryResDeath[0].death
-            }
-            catch {
-              setError(`Something went wrong, 
-                    Maybe Internet Connection Failed`);
+              setError(`Something went wrong, Maybe Internet Connection Failed`);
             }
           }
           catch { }
@@ -291,45 +265,17 @@ export default function GraphStats({ text }) {
         else {
           try {
             try {
-              const resConf = await fetch("https://covid1910.p.rapidapi.com/data/confirmed/country/" + country + "/date/" + month + dateDash + usingDate + "-"+year, {
+              const resConf = await fetch("https://covid-193.p.rapidapi.com/history?country=" + country + "&day=" +  year + "-" + month-- + dateDash + usingDate, {
                 "method": "GET",
                 "headers": {
                   "x-rapidapi-key": "008f2c29aamshe451c7d286c4d43p1fc2a8jsna64e71f494d5",
-                  "x-rapidapi-host": "covid1910.p.rapidapi.com"
+                  "x-rapidapi-host": "covid-193.p.rapidapi.com"
                 }
               })
               const countryResConf = await resConf.json()
-              dataConfirmed[dataIndex] = countryResConf[0].confirmed
-            }
-            catch {
-              setError(`Something went wrong, 
-                    Maybe Internet Connection Failed`);
-            }
-            try {
-              const resRecov = await fetch("https://covid1910.p.rapidapi.com/data/recovered/country/" + country + "/date/" + month + dateDash + usingDate + "-"+year, {
-                "method": "GET",
-                "headers": {
-                  "x-rapidapi-key": "008f2c29aamshe451c7d286c4d43p1fc2a8jsna64e71f494d5",
-                  "x-rapidapi-host": "covid1910.p.rapidapi.com"
-                }
-              })
-              const countryResRecov = await resRecov.json()
-              dataRecovered[dataIndex] = countryResRecov[0].recovered
-            }
-            catch {
-              setError(`Something went wrong, 
-                    Maybe Internet Connection Failed`);
-            }
-            try {
-              const resDeath = await fetch("https://covid1910.p.rapidapi.com/data/death/country/" + country + "/date/" + month-- + dateDash + usingDate + "-"+year, {
-                "method": "GET",
-                "headers": {
-                  "x-rapidapi-key": "008f2c29aamshe451c7d286c4d43p1fc2a8jsna64e71f494d5",
-                  "x-rapidapi-host": "covid1910.p.rapidapi.com"
-                }
-              })
-              const countryResDeath = await resDeath.json()
-              dataDeaths[dataIndex] = countryResDeath[0].death
+              dataConfirmed[dataIndex] = countryResConf.response[0].cases.total
+              dataRecovered[dataIndex] = countryResConf.response[0].cases.recovered
+              dataDeaths[dataIndex] = countryResConf.response[0].deaths.total
             }
             catch {
               setError(`Something went wrong, 
@@ -388,7 +334,6 @@ export default function GraphStats({ text }) {
       }
     }
     GetApiData()
-
   }, [value, text])
   return (
     <div>

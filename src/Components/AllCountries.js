@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 let checker = 'incomplete';
-export default function AllCountries({ currentScreen, text, userId }) {
+export default function AllCountries({ text, userId }) {
   const [covidData, setCovidData] = useState({});
   const [totalData, setTotalData] = useState({});
   const [Loading, setLoading] = React.useState('');
